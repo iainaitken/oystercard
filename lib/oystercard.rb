@@ -17,10 +17,6 @@ class Oystercard
     @balance += cash
   end
 
-  def deduct(cash)
-    @balance -= cash
-  end
-
   def touch_in
     raise("Not enough money on card") if @balance < MINIMUM_BALANCE
     @in_use = true
@@ -28,6 +24,12 @@ class Oystercard
 
   def touch_out
     @in_use = false
+    deduct(MINIMUM_BALANCE)
+  end
+
+  private
+  def deduct(cash)
+    @balance -= cash
   end
 
 end

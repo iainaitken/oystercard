@@ -20,13 +20,6 @@ describe Oystercard do
     end
   end
 
-  describe '#deduct'do
-    it 'Card deducts cash from balance' do
-      subject.top_up(10)
-      expect{subject.deduct(10)}.to change{subject.balance}.by -10
-    end
-  end
-
   describe '#touch_in' do
     it 'user can use card to touch in' do
       expect(subject).to respond_to(:touch_in)
@@ -47,6 +40,12 @@ describe Oystercard do
     it 'user can use card to touch out' do
       expect(subject).to respond_to(:touch_out)
     end
+    it 'user is charged on touch out' do
+      subject.top_up(Oystercard::MINIMUM_BALANCE)
+      subject.touch_in
+      expect{subject.touch_out}.to change{subject.balance}.by -Oystercard::MINIMUM_BALANCE
+    end
+
     context 'when user has touched out' do
       it 'card is not in use' do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
