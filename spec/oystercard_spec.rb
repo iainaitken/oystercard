@@ -1,7 +1,8 @@
 require 'oystercard'
 
 describe Oystercard do
-  let(:station) { double(:station) }
+  let(:entry_station) { double(:station) }
+  let(:exit_station) { double(:station) }
 
   it 'oystercard has a balance of 0' do
     expect(subject.balance).to eq Oystercard::DEFAULT_BALANCE
@@ -26,18 +27,18 @@ describe Oystercard do
       expect(subject).to respond_to(:touch_in)
     end
     it 'user cannot touch in if they are poor' do
-      expect { subject.touch_in(station) }.to raise_error("Not enough money on card")
+      expect { subject.touch_in(entry_station) }.to raise_error("Not enough money on card")
     end
     context 'when user has touched in' do
       before(:each) do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
       end
       it 'card is in use' do
-        subject.touch_in(station)
+        subject.touch_in(entry_station)
         expect(subject.in_journey?).to be true
       end
       it 'has stored touch_in station' do
-        expect { subject.touch_in(station) }.to change { subject.entry_station }.to station
+        expect { subject.touch_in(entry_station) }.to change { subject.entry_station }.to entry_station
       end
     end
   end
@@ -48,21 +49,24 @@ describe Oystercard do
     end
     it 'user is charged on touch out' do
       subject.top_up(Oystercard::MINIMUM_BALANCE)
-      subject.touch_in(station)
-      expect{subject.touch_out}.to change{subject.balance}.by -Oystercard::MINIMUM_BALANCE
+      subject.touch_in(entry_station)
+      expect{subject.touch_out(exit_station)}.to change{subject.balance}.by -Oystercard::MINIMUM_BALANCE
     end
 
     context 'when user has touched out' do
       before(:each) do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
-        subject.touch_in(station)
+        subject.touch_in(entry_station)
       end
       it 'card is not in use' do
-        subject.touch_out
+        subject.touch_out(exit_station)
         expect(subject.in_journey?).to be false
       end
       it 'changes entry_station value to nil' do
-        expect { subject.touch_out }.to change { subject.entry_station }.to nil
+        expect { subject.touch_out(exit_station) }.to change { subject.entry_station }.to nil
+      end
+      it 'has stored touch_out station' do
+        expect { subject.touch_out(exit_station) }.to change { subject.exit_station }
       end
     end
   end
