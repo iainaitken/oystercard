@@ -1,6 +1,7 @@
 require 'oystercard'
 
 describe Oystercard do
+  let(:station) { double(:station) }
 
   it 'oystercard has a balance of 0' do
     expect(subject.balance).to eq Oystercard::DEFAULT_BALANCE
@@ -25,13 +26,18 @@ describe Oystercard do
       expect(subject).to respond_to(:touch_in)
     end
     it 'user cannot touch in if they are poor' do
-      expect { subject.touch_in }.to raise_error("Not enough money on card")
+      expect { subject.touch_in(station) }.to raise_error("Not enough money on card")
     end
     context 'when user has touched in' do
-      it 'card is in use' do
+      before(:each) do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
-        subject.touch_in
+      end
+      it 'card is in use' do
+        subject.touch_in(station)
         expect(subject.in_journey?).to be true
+      end
+      it 'has stored touch_in station' do
+        expect { subject.touch_in(station) }.to change { subject.entry_station }.to station
       end
     end
   end
@@ -42,14 +48,14 @@ describe Oystercard do
     end
     it 'user is charged on touch out' do
       subject.top_up(Oystercard::MINIMUM_BALANCE)
-      subject.touch_in
+      subject.touch_in(station)
       expect{subject.touch_out}.to change{subject.balance}.by -Oystercard::MINIMUM_BALANCE
     end
 
     context 'when user has touched out' do
       it 'card is not in use' do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
-        subject.touch_in
+        subject.touch_in(station)
         subject.touch_out
         expect(subject.in_journey?).to be false
       end
