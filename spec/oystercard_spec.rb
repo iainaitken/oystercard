@@ -26,4 +26,35 @@ describe Oystercard do
       expect{subject.deduct(10)}.to change{subject.balance}.by -10
     end
   end
+
+  describe '#touch_in' do
+    it 'user can use card to touch in' do
+      expect(subject).to respond_to(:touch_in)
+    end
+    context 'when user has touched in' do
+      it 'card is in use' do
+        subject.touch_in
+        expect(subject.in_journey?).to be true
+      end
+    end
+  end
+
+  describe '#touch-out' do
+    it 'user can use card to touch out' do
+      expect(subject).to respond_to(:touch_out)
+    end
+    context 'when user has touched out' do
+      it 'card is not in use' do
+        subject.touch_in
+        subject.touch_out
+        expect(subject.in_journey?).to be false
+      end
+    end
+  end
+
+  describe '#in_journey?' do
+    it 'user can check whether card is in use' do
+      expect(subject).to respond_to(:in_journey?)
+    end
+  end
 end
