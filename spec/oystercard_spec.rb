@@ -53,11 +53,16 @@ describe Oystercard do
     end
 
     context 'when user has touched out' do
-      it 'card is not in use' do
+      before(:each) do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
         subject.touch_in(station)
+      end
+      it 'card is not in use' do
         subject.touch_out
         expect(subject.in_journey?).to be false
+      end
+      it 'changes entry_station value to nil' do
+        expect { subject.touch_out }.to change { subject.entry_station }.to nil
       end
     end
   end
