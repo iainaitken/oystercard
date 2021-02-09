@@ -4,6 +4,7 @@ class Oystercard
   undef :in_use
 
   DEFAULT_BALANCE = 0
+  MINIMUM_BALANCE = 1
   MAXIMUM_BALANCE = 90
 
   def initialize
@@ -21,6 +22,7 @@ class Oystercard
   end
 
   def touch_in
+    raise("Not enough money on card") if @balance < MINIMUM_BALANCE
     @in_use = true
   end
 

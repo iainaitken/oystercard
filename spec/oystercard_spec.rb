@@ -31,8 +31,12 @@ describe Oystercard do
     it 'user can use card to touch in' do
       expect(subject).to respond_to(:touch_in)
     end
+    it 'user cannot touch in if they are poor' do
+      expect { subject.touch_in }.to raise_error("Not enough money on card")
+    end
     context 'when user has touched in' do
       it 'card is in use' do
+        subject.top_up(Oystercard::MINIMUM_BALANCE)
         subject.touch_in
         expect(subject.in_journey?).to be true
       end
@@ -45,6 +49,7 @@ describe Oystercard do
     end
     context 'when user has touched out' do
       it 'card is not in use' do
+        subject.top_up(Oystercard::MINIMUM_BALANCE)
         subject.touch_in
         subject.touch_out
         expect(subject.in_journey?).to be false
