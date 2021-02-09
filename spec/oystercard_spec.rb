@@ -38,7 +38,7 @@ describe Oystercard do
         expect(subject.in_journey?).to be true
       end
       it 'has stored touch_in station' do
-        expect { subject.touch_in(entry_station) }.to change { subject.entry_station }.to entry_station
+        expect { subject.touch_in(entry_station) }.to change { subject.current_journey[:entry_station] }.to entry_station
       end
     end
   end
@@ -62,11 +62,15 @@ describe Oystercard do
         subject.touch_out(exit_station)
         expect(subject.in_journey?).to be false
       end
-      it 'changes entry_station value to nil' do
-        expect { subject.touch_out(exit_station) }.to change { subject.entry_station }.to nil
+      it 'changes current_journey values to nil' do
+        expect { subject.touch_out(exit_station) }.to change { subject.current_journey[:entry_station] }.to nil
+        #  .and change { subject.current_journey[:entry_station] }.to nil
       end
       it 'has stored touch_out station' do
-        expect { subject.touch_out(exit_station) }.to change { subject.exit_station }
+        expect { subject.touch_out(exit_station) }.to change { subject.journeys }
+      end
+      it 'has stored current_journey' do
+        expect { subject.touch_out(exit_station) }.to change {subject.current_journey}
       end
     end
   end
